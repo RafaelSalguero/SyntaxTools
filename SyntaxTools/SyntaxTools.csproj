@@ -41,8 +41,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="DataStructures\ISubstring.cs" />
     <Compile Include="DataStructures\StateDequeue.cs" />
+    <Compile Include="Global\GuidNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Text\LexerUnits\INoLookupLexerUnit.cs" />
+    <Compile Include="Text\LexerUnits\ITokenizedLexerUnit.cs" />
+    <Compile Include="Text\LexerUnits\LexerSplitter.cs" />
+    <Compile Include="Text\LexerUnits\StateMachines\WhitespaceParser.cs" />
+    <Compile Include="Text\LexerUnits\StateMachines\WordParser.cs" />
+    <Compile Include="Text\WordSplitter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
