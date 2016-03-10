@@ -14,14 +14,11 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="Begin"></param>
-        /// <param name="End"></param>
-        /// <param name="AllowOpenEnds">If true when the begin is found, this would be considered a valid unit, event if the end is never found</param>
-        /// <param name="Id"></param>
-        public BeginEndParser(IStateMachineParser Begin, IStateMachineParser End, bool AllowOpenEnds, string friendlyName)
+        /// <param name="Begin">Block begin parser. Remember not to share parser instances because each instance is an state machine</param>
+        /// <param name="End">Block end parser. Remember not to share parser instances because each instance is an state machine</param>
+        /// <param name="AllowOpenEnds">If true when the begin is found, this would be considered a valid unit, even if the end is never found</param>
+        public BeginEndParser(IStateMachineParser Begin, IStateMachineParser End, bool AllowOpenEnds, string friendlyName = "")
         {
-            this.friendlyName = friendlyName;
-
             this.AllowOpenEnds = AllowOpenEnds;
             this.Begin = Begin;
             this.End = End;

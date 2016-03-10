@@ -12,35 +12,35 @@ namespace SyntaxTools.Test
     [TestClass]
     public class UnitTest1
     {
-static List<string> Split(string Text, IEnumerable<char> Separators)
-{
-    var result = new List<string>();
-    //String builder is used for performance
-    var B = new StringBuilder();
-    foreach (var c in Text)
-    {
-        if (Separators.Contains(c))
+        static List<string> Split(string Text, IEnumerable<char> Separators)
         {
-            //Add the string acumulated before the separator
-            if (B.Length > 0)
+            var result = new List<string>();
+            //String builder is used for performance
+            var B = new StringBuilder();
+            foreach (var c in Text)
             {
-                result.Add(B.ToString());
-                B.Clear();
+                if (Separators.Contains(c))
+                {
+                    //Add the string acumulated before the separator
+                    if (B.Length > 0)
+                    {
+                        result.Add(B.ToString());
+                        B.Clear();
+                    }
+                    //Add the separator:
+                    result.Add(c.ToString());
+                }
+                else
+                    //Acumulate the string
+                    B.Append(c);
             }
-            //Add the separator:
-            result.Add(c.ToString());
+
+            //If there are an acumulated string, added to the list:
+            if (B.Length > 0)
+                result.Add(B.ToString());
+
+            return result;
         }
-        else
-            //Acumulate the string
-            B.Append(c);
-    }
-
-    //If there are an acumulated string, added to the list:
-    if (B.Length > 0)
-        result.Add(B.ToString());
-
-    return result;
-}
 
         [TestMethod]
         public void Test()
@@ -66,6 +66,96 @@ static List<string> Split(string Text, IEnumerable<char> Separators)
 
         }
 
+
+
+        [TestMethod]
+        public void WordSplitterTest3()
+        {
+            var text = "//this is a comment\r\nresult = \"hi there\" + name";
+
+            //parsers:
+            var linejump = new LineJumpParser().SetSymbol();
+            var lineComment = new BeginEndParser(new WordParser("//"), new LineJumpParser(), true).SetSymbol();
+            var stringLiteral = new StringParser().SetSymbol();
+            var whitespace = new WhitespaceParser().SetSymbol();
+
+            var split = LexerSplitter.Split(text, new[] { linejump, lineComment, stringLiteral, whitespace });
+
+            var result = split.Select(x => Tuple.Create(x.Index, x.Length, x.Token));
+            var expected = new[]
+            {
+                Tuple.Create (0,21, lineComment.Token ) ,
+                Tuple.Create (21,6, Guid.Empty ) ,
+                Tuple.Create (27,1, whitespace.Token ) ,
+                Tuple.Create (28,1, Guid.Empty ) ,
+                Tuple.Create (29,1, whitespace.Token ) ,
+                Tuple.Create (30,10, stringLiteral.Token ) ,
+                Tuple.Create (40,1, whitespace.Token ) ,
+                Tuple.Create (41,1, Guid.Empty ) ,
+                Tuple.Create (42,1, whitespace.Token ) ,
+                Tuple.Create (43,4, Guid.Empty ) ,
+            };
+
+            Assert.IsTrue(expected.SequenceEqual(result));
+        }
+        [TestMethod]
+        public void WordSplitterTest2()
+        {
+            var text = "a === bcd ==\t e=+1.0";
+
+            //parsers:
+            var equal3 = new WordParser("===").SetSymbol();
+            var equals = new WordParser("==").SetSymbol();
+            var assign = new WordParser("=").SetSymbol();
+            var plus = new WordParser("+").SetSymbol();
+            var space = new WhitespaceParser().SetSymbol();
+            var number = new NumberParser().SetSymbol();
+
+            var parsers = new[] { equal3, equals, assign, plus, space, number };
+
+            var split = LexerSplitter.Split(text.AsSubstring(), parsers);
+            var expected = new[]
+            {
+                //Unidentified word 'a'
+                text.AsSubstring (0,1).AsToken (Guid.Empty ),
+
+                //whitespace
+                text.AsSubstring(1,1).AsToken (space.Token ),
+            
+                //equals3 '==='
+                text.AsSubstring(2, 3).AsToken (equal3.Token ),
+
+                //whitespace
+                text.AsSubstring(5,1).AsToken (space.Token ),
+
+                //Unidentified word 'bcd'
+                text.AsSubstring (6,3).AsToken (Guid.Empty ),
+
+                //whitespace
+                text.AsSubstring(9,1).AsToken (space.Token ),
+
+                //equals
+                text.AsSubstring (10,2).AsToken (equals.Token),
+
+                //whitespace
+                text.AsSubstring(12,2).AsToken (space.Token ),
+
+                //Unidentified word 'e'
+                text.AsSubstring (14,1).AsToken (Guid.Empty ),
+
+                //asignment
+                text.AsSubstring (15,1).AsToken (assign.Token),
+
+                 //plus
+                text.AsSubstring (16,1).AsToken (plus.Token),
+
+                 //number
+                text.AsSubstring (17,3).AsToken (number.Token),
+            };
+
+            Assert.IsTrue(expected.SequenceEqual(split));
+        }
+
         [TestMethod]
         public void WordSplitterTest()
         {
@@ -73,13 +163,12 @@ static List<string> Split(string Text, IEnumerable<char> Separators)
             var hola = new WordParser("hello").SetSymbol();
             var rafa = new WordParser("rafa").SetSymbol();
 
-            //Create a text splitter with two simple word parsers
-            var Splitter = new SubstringLexerSeparator(new[] { hola, rafa });
+            var parsers = new[] { hola, rafa };
 
-            //Text to sply
+            //Text to split
             var text = "helloaloharafarafael";
 
-            var result = Splitter.Split(text);
+            var result = LexerSplitter.Split(text, parsers);
             var expected = new[]
             {
                 //symbol "hola" on substring (0,5)

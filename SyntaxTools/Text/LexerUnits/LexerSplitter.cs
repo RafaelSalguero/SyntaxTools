@@ -63,14 +63,11 @@ namespace SyntaxTools.Text.LexerUnits
                 return Lenght.ToString();
         }
     }
-    public class SubstringLexerSeparator
+    /// <summary>
+    /// Provides methods for splitting strings with state machine parsers
+    /// </summary>
+    public static class LexerSplitter
     {
-        public SubstringLexerSeparator(IEnumerable<ITokenizedParser> Units)
-        {
-            this.Units = new List<ITokenizedParser>(Units);
-        }
-        public List<ITokenizedParser> Units;
-
         /// <summary>
         /// 
         /// </summary>
@@ -78,7 +75,7 @@ namespace SyntaxTools.Text.LexerUnits
         /// <param name="index"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public LexerWordLenght FindLargestValidSequence(string Text, int index, int count)
+        public static LexerWordLenght FindLargestValidSequence(string Text, int index, int count, IEnumerable<ITokenizedParser> Parsers)
         {
             int len = 0;
             int maxValidLen = 0;
@@ -90,7 +87,7 @@ namespace SyntaxTools.Text.LexerUnits
             {
                 len++;
                 anyPossible = false;
-                foreach (var U in Units)
+                foreach (var U in Parsers)
                 {
                     if (U.IsPossible() || U.IsValid())
                     {
@@ -123,53 +120,65 @@ namespace SyntaxTools.Text.LexerUnits
                 //There was only one largest valid parser
                 return new LexerWordLenght(maxValidLen, MaxValidUnits[0].Token);
             else
-                //There wasn't any valid parser
+                //There wasn't any valid parser, return lenght of 1 to continue to the next character
                 return new LexerWordLenght(1, Guid.Empty);
         }
 
-        public List<ITokenSubstring<Guid>> Split(string Text)
+        /// <summary>
+        /// Split a substring by finding the largest symbol identified by the given parsers
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <param name="Parsers"></param>
+        /// <returns></returns>
+        public static List<ITokenSubstring<Guid>> Split(string Text, IEnumerable<ITokenizedParser> Parsers)
         {
-            return Split(Text.AsSubstring());
+            return Split(Text.AsSubstring(), Parsers);
         }
-        public List<ITokenSubstring<Guid>> Split(ISubstring Text)
+        /// <summary>
+        /// Split a substring by finding the largest symbol identified by the given parsers
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static List<ITokenSubstring<Guid>> Split(ISubstring Text, IEnumerable<ITokenizedParser> Parsers)
         {
             var str = Text.CompleteString;
-            var Ret = new List<ITokenSubstring<Guid>>();
-
+            var result = new List<ITokenSubstring<Guid>>();
+            //Text substring indexes:
             int index = Text.Index;
             int lastIndex = Text.Index + Text.Length;
 
+            //Length of the current unidentified word
             int UnidentifiedWordLen = 0;
             int i;
             for (i = index; i < lastIndex;)
             {
                 //Reset all units
-                foreach (var U in Units) U.Reset();
+                foreach (var U in Parsers) U.Reset();
 
                 //Find the next largest leaf:
-                var AdvanceWord = FindLargestValidSequence(Text.CompleteString, i, lastIndex - i);
+                var AdvanceWord = FindLargestValidSequence(Text.CompleteString, i, lastIndex - i, Parsers);
 
                 if (AdvanceWord.Token == Guid.Empty)
                     UnidentifiedWordLen++;
                 else
                 {
+                    //Add the last unidentified word if any
                     if (UnidentifiedWordLen > 0)
                     {
-                        Ret.Add(str.AsSubstring(i - UnidentifiedWordLen, UnidentifiedWordLen).AsToken(Guid.Empty));
+                        result.Add(str.AsSubstring(i - UnidentifiedWordLen, UnidentifiedWordLen).AsToken(Guid.Empty));
                         UnidentifiedWordLen = 0;
                     }
-
-                    Ret.Add(str.AsSubstring(i, AdvanceWord.Lenght).AsToken(AdvanceWord.Token));
+                    //Add the parsed symbol
+                    result.Add(str.AsSubstring(i, AdvanceWord.Lenght).AsToken(AdvanceWord.Token));
                 }
-
+                //Advance the char index by the length returned by the FindLargestValidSequence
                 i += AdvanceWord.Lenght;
             }
 
+            //Add the last unidentified word if any
             if (UnidentifiedWordLen > 0)
-            {
-                Ret.Add(str.AsSubstring(i - UnidentifiedWordLen, UnidentifiedWordLen).AsToken(Guid.Empty));
-            }
-            return Ret;
+                result.Add(str.AsSubstring(i - UnidentifiedWordLen, UnidentifiedWordLen).AsToken(Guid.Empty));
+            return result;
         }
 
 
