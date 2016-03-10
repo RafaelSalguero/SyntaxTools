@@ -9,7 +9,7 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
    /// <summary>
     /// Identify a sequence of spaces and tabs
     /// </summary>
-    public class WhitespaceParser : INoLookupLexerUnitParser
+    public class WhitespaceParser : IStateMachineParser
     {
         public enum SpaceLexerState
         {
@@ -36,17 +36,17 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
                     if (Current == ' ')
                     {
                         State = SpaceLexerState.SpaceOrTab;
-                        CurrentValidity = LexerUnitValidity.ValidPosible;
+                        CurrentValidity = ParserState.ValidPossible;
                     } 
                     else if (Current == '\t')
                     {
                         State = SpaceLexerState.SpaceOrTab;
-                        CurrentValidity = LexerUnitValidity.ValidPosible;
+                        CurrentValidity = ParserState.ValidPossible;
                     }
                     else
                     {
                         State = SpaceLexerState.Invalid;
-                        CurrentValidity = LexerUnitValidity.Invalid;
+                        CurrentValidity = ParserState.Invalid;
                     }
                     break;
                 default:
@@ -56,11 +56,11 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
 
         public void Reset()
         {
-            CurrentValidity = LexerUnitValidity.Posible;
+            CurrentValidity = ParserState.Possible;
             State = SpaceLexerState.SpaceOrTab;
         }
 
-        public LexerUnitValidity CurrentValidity
+        public ParserState CurrentValidity
         {
             get;
             private set;

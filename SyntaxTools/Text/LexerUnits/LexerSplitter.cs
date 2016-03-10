@@ -71,33 +71,45 @@ namespace SyntaxTools.Text.LexerUnits
         }
         public List<ITokenizedParser> Units;
 
-        public LexerWordLenght FindValidLeaf(string Text, int index, int count)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <param name="index"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public LexerWordLenght FindLargestValidSequence(string Text, int index, int count)
         {
             int len = 0;
             int maxValidLen = 0;
             List<ITokenizedParser> MaxValidUnits = new List<ITokenizedParser>();
 
-            bool anyPosible = true;
-            while (anyPosible && len < count)
+            bool anyPossible = true;
+            //loop when there are any parsers with Possible or ValidPossible states
+            while (anyPossible && len < count)
             {
                 len++;
-                anyPosible = false;
+                anyPossible = false;
                 foreach (var U in Units)
                 {
-                    if (U.IsPosible() || U.IsValid())
+                    if (U.IsPossible() || U.IsValid())
                     {
+                        //Append characters to all Valid/Possible/ValidPossible parsers
                         U.Append(Text[index]);
 
-                        if (U.IsPosible())
-                            anyPosible = true;
+                        if (U.IsPossible())
+                            anyPossible = true;
                     }
                     if (U.IsValid())
                     {
+                        //If this is the largest valid parser, remove all others
                         if (len > maxValidLen)
                         {
                             MaxValidUnits.Clear();
                             maxValidLen = len;
                         }
+
+                        //Add this parser as the valid one
                         MaxValidUnits.Add(U);
                     }
                 }
@@ -105,10 +117,13 @@ namespace SyntaxTools.Text.LexerUnits
                 index++;
             }
             if (MaxValidUnits.Count > 1)
-                throw new ApplicationException("Can't diferentiate between valid units");
+                //There are more than one valid parsers
+                throw new ApplicationException("Can't diferentiate between two valid sequences");
             else if (MaxValidUnits.Count == 1)
+                //There was only one largest valid parser
                 return new LexerWordLenght(maxValidLen, MaxValidUnits[0].Token);
             else
+                //There wasn't any valid parser
                 return new LexerWordLenght(1, Guid.Empty);
         }
 
@@ -132,7 +147,7 @@ namespace SyntaxTools.Text.LexerUnits
                 foreach (var U in Units) U.Reset();
 
                 //Find the next largest leaf:
-                var AdvanceWord = FindValidLeaf(Text.CompleteString, i, lastIndex - i);
+                var AdvanceWord = FindLargestValidSequence(Text.CompleteString, i, lastIndex - i);
 
                 if (AdvanceWord.Token == Guid.Empty)
                     UnidentifiedWordLen++;

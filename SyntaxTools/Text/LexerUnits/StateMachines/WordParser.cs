@@ -9,7 +9,7 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
     /// <summary>
     /// A lexer unit that parses a whole word
     /// </summary>
-    public class WordParser : INoLookupLexerUnitParser
+    public class WordParser : IStateMachineParser
     {
         public WordParser(string Word)
         {
@@ -19,32 +19,35 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
 
         private readonly string Value;
         /// <summary>
-        /// The last valid lenght
+        /// The number of valid characters apended
         /// </summary>
         private int ValidLen = 0;
+        public void Append(char Current)
+        {
+            //If the current character is the next character on the word
+            if (ValidLen < Value.Length && Value[ValidLen] == Current)
+            {
+                ValidLen++;
+                //If the whole word was added, set Valid, else possible
+                Validity = ValidLen == Value.Length ? ParserState.Valid : ParserState.Possible;
+            }
+            else
+                Validity = ParserState.Invalid;
+        }
 
         public void Reset()
         {
             ValidLen = 0;
             if (Value.Length == 0)
-                Validity = LexerUnitValidity.Valid;
+                Validity = ParserState.Valid;
             else
-                Validity = LexerUnitValidity.Posible;
+                Validity = ParserState.Possible;
         }
 
-        public void Append(char Current)
-        {
-            if (ValidLen < Value.Length && Value[ValidLen] == Current)
-            {
-                ValidLen++;
-                Validity = ValidLen < Value.Length ? LexerUnitValidity.Posible : LexerUnitValidity.Valid;
-            }
-            else
-                Validity = LexerUnitValidity.Invalid;
-        }
 
-        private LexerUnitValidity Validity;
-        public LexerUnitValidity CurrentValidity
+
+        private ParserState Validity;
+        public ParserState CurrentValidity
         {
             get { return Validity; }
         }
@@ -54,6 +57,6 @@ namespace SyntaxTools.Text.LexerUnits.StateMachines
             return Value;
         }
 
-      
+
     }
 }

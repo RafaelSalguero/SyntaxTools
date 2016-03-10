@@ -48,6 +48,10 @@
     <Compile Include="Text\LexerUnits\INoLookupLexerUnit.cs" />
     <Compile Include="Text\LexerUnits\ITokenizedLexerUnit.cs" />
     <Compile Include="Text\LexerUnits\LexerSplitter.cs" />
+    <Compile Include="Text\LexerUnits\StateMachines\BeginEndParser.cs" />
+    <Compile Include="Text\LexerUnits\StateMachines\LineJumpParser.cs" />
+    <Compile Include="Text\LexerUnits\StateMachines\NumberParser.cs" />
+    <Compile Include="Text\LexerUnits\StateMachines\StringParser.cs" />
     <Compile Include="Text\LexerUnits\StateMachines\WhitespaceParser.cs" />
     <Compile Include="Text\LexerUnits\StateMachines\WordParser.cs" />
     <Compile Include="Text\WordSplitter.cs" />

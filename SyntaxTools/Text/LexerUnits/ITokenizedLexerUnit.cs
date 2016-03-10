@@ -10,7 +10,7 @@ namespace SyntaxTools.Text.LexerUnits
     /// <summary>
     /// Pairs a lexer unit with a guid
     /// </summary>
-    public interface ITokenizedParser : INoLookupLexerUnitParser
+    public interface ITokenizedParser : IStateMachineParser
     {
         Guid Token { get; }
     }
@@ -21,7 +21,7 @@ namespace SyntaxTools.Text.LexerUnits
         /// Return the given parser paired with a guid representing a symbol
         /// </summary>
         /// <param name="Symbol">The symbol to pair</param>
-        public static ITokenizedParser SetSymbol(this INoLookupLexerUnitParser Parser, Guid Symbol)
+        public static ITokenizedParser SetSymbol(this IStateMachineParser Parser, Guid Symbol)
         {
             return new SingleTokenParser(Symbol, Parser);
         }
@@ -30,7 +30,7 @@ namespace SyntaxTools.Text.LexerUnits
         /// Return the given parser paired with a random guid representing a symbol
         /// </summary>
         /// <param name="Symbol">The symbol to pair</param>
-        public static ITokenizedParser SetSymbol(this INoLookupLexerUnitParser Parser)
+        public static ITokenizedParser SetSymbol(this IStateMachineParser Parser)
         {
             return Parser.SetSymbol(Guid.NewGuid());
         }
@@ -45,14 +45,14 @@ namespace SyntaxTools.Text.LexerUnits
             /// </summary>
             /// <param name="Token">The guid that will identify the symbol</param>
             /// <param name="Parser">State machine that will parse the symbol</param>
-            public SingleTokenParser(Guid Token, INoLookupLexerUnitParser Parser)
+            public SingleTokenParser(Guid Token, IStateMachineParser Parser)
             {
                 GuidNames.AddToken(Token, Parser.ToString());
                 this.Token = Token;
                 this.Parser = Parser;
             }
 
-            private INoLookupLexerUnitParser Parser;
+            private IStateMachineParser Parser;
 
             /// <summary>
             /// Lexer unit token
@@ -63,17 +63,17 @@ namespace SyntaxTools.Text.LexerUnits
                 private set;
             }
 
-            void INoLookupLexerUnitParser.Append(char Current)
+            void IStateMachineParser.Append(char Current)
             {
                 Parser.Append(Current);
             }
 
-            void INoLookupLexerUnitParser.Reset()
+            void IStateMachineParser.Reset()
             {
                 Parser.Reset();
             }
 
-            LexerUnitValidity INoLookupLexerUnitParser.CurrentValidity
+            ParserState IStateMachineParser.CurrentValidity
             {
                 get
                 {

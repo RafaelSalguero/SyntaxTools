@@ -10,26 +10,26 @@ namespace SyntaxTools.Text.LexerUnits
     /// <summary>
     /// A parser unit with no look up
     /// </summary>
-    public interface INoLookupLexerUnitParser
+    public interface IStateMachineParser
     {
         /// <summary>
-        /// Append this character to the parser unit
+        /// Append this character to the parser
         /// </summary>
         /// <param name="C"></param>
         void Append(char Current);
 
         /// <summary>
-        /// Reset the lexer unit to its original state
+        /// Reset the parser to its original state
         /// </summary>
         void Reset();
 
-        LexerUnitValidity CurrentValidity { get; }
+        ParserState CurrentValidity { get; }
     }
 
     /// <summary>
     /// Determines the state of a lexer unit acording to past character inputs
     /// </summary>
-    public enum LexerUnitValidity
+    public enum ParserState
     {
         /// <summary>
         /// This word or any word that results in the concatenation of this word and other word doesn't comply with this parser unit validation
@@ -44,12 +44,12 @@ namespace SyntaxTools.Text.LexerUnits
         /// <summary>
         /// This word is valid as is, if a character is added, the word could be still be a valid unit
         /// </summary>
-        ValidPosible,
+        ValidPossible,
 
         /// <summary>
         /// This word as is doesn't comply with the validation but the result of this word and concatenation of one or more characters could return in a valid word
         /// </summary>
-        Posible
+        Possible
     }
 
     public static class LexerUnitExtensiosns
@@ -59,9 +59,9 @@ namespace SyntaxTools.Text.LexerUnits
         /// </summary>
         /// <param name="Unit"></param>
         /// <returns></returns>
-        public static bool IsPosible(this INoLookupLexerUnitParser Unit)
+        public static bool IsPossible(this IStateMachineParser Unit)
         {
-            return Unit.CurrentValidity == LexerUnitValidity.Posible || Unit.CurrentValidity == LexerUnitValidity.ValidPosible;
+            return Unit.CurrentValidity == ParserState.Possible || Unit.CurrentValidity == ParserState.ValidPossible;
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace SyntaxTools.Text.LexerUnits
         /// </summary>
         /// <param name="Unit"></param>
         /// <returns></returns>
-        public static bool IsValid(this INoLookupLexerUnitParser Unit)
+        public static bool IsValid(this IStateMachineParser Unit)
         {
-            return Unit.CurrentValidity == LexerUnitValidity.Valid || Unit.CurrentValidity == LexerUnitValidity.ValidPosible;
+            return Unit.CurrentValidity == ParserState.Valid || Unit.CurrentValidity == ParserState.ValidPossible;
         }
 
 
@@ -80,9 +80,9 @@ namespace SyntaxTools.Text.LexerUnits
         /// </summary>
         /// <param name="Unit"></param>
         /// <returns></returns>
-        public static bool IsInvalid(this INoLookupLexerUnitParser Unit)
+        public static bool IsInvalid(this IStateMachineParser Unit)
         {
-            return Unit.CurrentValidity == LexerUnitValidity.Invalid;
+            return Unit.CurrentValidity == ParserState.Invalid;
         }
     }
 }
