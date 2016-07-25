@@ -44,8 +44,14 @@
     <Compile Include="DataStructures\ISubstring.cs" />
     <Compile Include="DataStructures\StateDequeue.cs" />
     <Compile Include="Global\GuidNames.cs" />
+    <Compile Include="Global\CommonOperators.cs" />
+    <Compile Include="Operators\OperatorSolver.cs" />
+    <Compile Include="Operators\Operator.cs" />
+    <Compile Include="Precedence\RPN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Text\LexerUnits\INoLookupLexerUnit.cs" />
+    <Compile Include="Global\CommonTokens.cs" />
+    <Compile Include="Text\LexerDictionary.cs" />
+    <Compile Include="Text\LexerUnits\IStateMachineParser.cs" />
     <Compile Include="Text\LexerUnits\ITokenizedLexerUnit.cs" />
     <Compile Include="Text\LexerUnits\LexerSplitter.cs" />
     <Compile Include="Text\LexerUnits\StateMachines\BeginEndParser.cs" />
@@ -55,6 +61,13 @@
     <Compile Include="Text\LexerUnits\StateMachines\WhitespaceParser.cs" />
     <Compile Include="Text\LexerUnits\StateMachines\WordParser.cs" />
     <Compile Include="Text\WordSplitter.cs" />
+    <Compile Include="Tree\MatchResult.cs" />
+    <Compile Include="Tree\Patterns\Leaf.cs" />
+    <Compile Include="Tree\Patterns\PermutationGenerator.cs" />
+    <Compile Include="Tree\Patterns\Sequence\Exact.cs" />
+    <Compile Include="Tree\Patterns\Variable.cs" />
+    <Compile Include="Tree\Patterns\TreePattern.cs" />
+    <Compile Include="Tree\Tree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

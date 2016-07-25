@@ -47,7 +47,7 @@ namespace SyntaxTools.Text.LexerUnits
             /// <param name="Parser">State machine that will parse the symbol</param>
             public SingleTokenParser(Guid Token, IStateMachineParser Parser)
             {
-                GuidNames.AddToken(Token, Parser.ToString());
+                GuidNames.SetName(Token, Parser.ToString());
                 this.Token = Token;
                 this.Parser = Parser;
             }

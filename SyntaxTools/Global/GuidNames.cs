@@ -21,13 +21,24 @@ namespace SyntaxTools.Global
         }
 
         /// <summary>
-        /// Pair a guid with a friendly name
+        /// Pair a guid with a friendly name. Returns the same Guid
         /// </summary>
         /// <param name="Token"></param>
         /// <param name="Name"></param>
-        internal static void AddToken(Guid Token, string Name)
+        internal static Guid SetName(Guid Token, string Name)
         {
             Names[Token] = Name;
+            return Token;
+        }
+
+        /// <summary>
+        /// Pair a new guid with a friendly name. Returns the same Guid
+        /// </summary>
+        /// <param name="Token"></param>
+        /// <param name="Name"></param>
+        internal static Guid SetName(string Name)
+        {
+            return SetName(Guid.NewGuid(), Name);
         }
 
         /// <summary>
