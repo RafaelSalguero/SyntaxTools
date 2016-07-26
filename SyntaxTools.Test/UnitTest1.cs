@@ -6,9 +6,26 @@ using SyntaxTools.Text.LexerUnits.StateMachines;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using SyntaxTools.Text;
 
 namespace SyntaxTools.Test
 {
+
+    public static class Extensions
+    {
+        public static Substring AsSubstring(this string s)
+        {
+            return new Substring(s);
+        }
+        public static Substring AsSubstring(this string s, int Index, int Count)
+        {
+            return new Substring(s, Index, Count);
+        }
+        public static TokenSubstring AsToken(this Substring s, Guid id)
+        {
+            return new TokenSubstring(id, s);
+        }
+    }
     [TestClass]
     public class UnitTest1
     {
@@ -60,7 +77,7 @@ namespace SyntaxTools.Test
             var rafa1_2 = str.AsSubstring(8, 4).AsToken(rafaGuid);
 
             Assert.IsTrue(hola1.Equals(hola1));
-            Assert.IsTrue(hola1.Equals(hola2));
+            Assert.IsFalse(hola1.Equals(hola2));
             Assert.IsTrue(rafa1_1.Equals(rafa1_2));
             Assert.IsFalse(hola1.Equals(rafa1_1));
 
@@ -79,9 +96,9 @@ namespace SyntaxTools.Test
             var stringLiteral = new StringParser().SetSymbol();
             var whitespace = new WhitespaceParser().SetSymbol();
 
-            var split = LexerSplitter.Split(text, new[] { linejump, lineComment, stringLiteral, whitespace });
+            var split = LexerSplitter.Split(new Substring(text), new[] { linejump, lineComment, stringLiteral, whitespace });
 
-            var result = split.Select(x => Tuple.Create(x.Index, x.Length, x.Token));
+            var result = split.Select(x => Tuple.Create(x.Substring.Index, x.Substring.Length, x.Symbol));
             var expected = new[]
             {
                 Tuple.Create (0,21, lineComment.Token ) ,
@@ -168,7 +185,7 @@ namespace SyntaxTools.Test
             //Text to split
             var text = "helloaloharafarafael";
 
-            var result = LexerSplitter.Split(text, parsers);
+            var result = LexerSplitter.Split(new Substring(text), parsers);
             var expected = new[]
             {
                 //symbol "hola" on substring (0,5)

@@ -8,9 +8,9 @@ using SyntaxTools.DataStructures;
 using SyntaxTools.Global;
 using SyntaxTools.Text;
 using SyntaxTools.Text.LexerUnits;
-using SyntaxTools.Tree;
-using SyntaxTools.Tree.Patterns;
-using SyntaxTools.Tree.Patterns.Sequence;
+using SyntaxTools.Trees;
+using SyntaxTools.Trees.Patterns;
+using SyntaxTools.Trees.Patterns.Sequence;
 namespace SyntaxTools.Test
 {
     [TestClass]
@@ -36,14 +36,14 @@ namespace SyntaxTools.Test
                 SpecialTokens.Number
             };
 
-            Assert.IsTrue(R.Select(x => x.Token).SequenceEqual(Expected));
+            Assert.IsTrue(R.Select(x => x.Symbol).SequenceEqual(Expected));
         }
 
         [TestMethod]
         public void PatternTest()
         {
             //pattern for x + x
-            var Pattern = new Tree.Patterns.Leaf<string>("+", new Exact<string>(new Variable<string>("x"), new Variable<string>("x")));
+            var Pattern = new Trees.Patterns.Leaf<string>("+", new Exact<string>(new Variable<string>("x"), new Variable<string>("x")));
 
             //expression 5 + 5
             var Expression = new Tree<string>("+", new Tree<string>("5"), new Tree<string>("5"));

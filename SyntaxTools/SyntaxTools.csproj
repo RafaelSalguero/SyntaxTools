@@ -40,13 +40,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="CompilerException.cs" />
     <Compile Include="DataStructures\ISubstring.cs" />
     <Compile Include="DataStructures\StateDequeue.cs" />
     <Compile Include="Global\GuidNames.cs" />
     <Compile Include="Global\CommonOperators.cs" />
+    <Compile Include="Operators\CallSolver.cs" />
     <Compile Include="Operators\OperatorSolver.cs" />
     <Compile Include="Operators\Operator.cs" />
+    <Compile Include="Operators\OperatorToken.cs" />
+    <Compile Include="Operators\StackTokenType.cs" />
     <Compile Include="Precedence\RPN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Global\CommonTokens.cs" />
@@ -60,14 +63,15 @@
     <Compile Include="Text\LexerUnits\StateMachines\StringParser.cs" />
     <Compile Include="Text\LexerUnits\StateMachines\WhitespaceParser.cs" />
     <Compile Include="Text\LexerUnits\StateMachines\WordParser.cs" />
+    <Compile Include="Text\TokenSubstring.cs" />
     <Compile Include="Text\WordSplitter.cs" />
-    <Compile Include="Tree\MatchResult.cs" />
-    <Compile Include="Tree\Patterns\Leaf.cs" />
-    <Compile Include="Tree\Patterns\PermutationGenerator.cs" />
-    <Compile Include="Tree\Patterns\Sequence\Exact.cs" />
-    <Compile Include="Tree\Patterns\Variable.cs" />
-    <Compile Include="Tree\Patterns\TreePattern.cs" />
-    <Compile Include="Tree\Tree.cs" />
+    <Compile Include="Trees\MatchResult.cs" />
+    <Compile Include="Trees\Patterns\Leaf.cs" />
+    <Compile Include="Trees\Patterns\PermutationGenerator.cs" />
+    <Compile Include="Trees\Patterns\Sequence\Exact.cs" />
+    <Compile Include="Trees\Patterns\Variable.cs" />
+    <Compile Include="Trees\Patterns\TreePattern.cs" />
+    <Compile Include="Trees\Tree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

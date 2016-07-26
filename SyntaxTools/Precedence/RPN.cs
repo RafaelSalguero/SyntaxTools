@@ -3,54 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SyntaxTools.Operators;
+using SyntaxTools.Trees;
 
 namespace SyntaxTools.Precedence
 {
-   public  class RPN
+    public static class RPN
     {
-        /// <summary>
-        /// Token type that will determinine the ordering on the InfixToRPN Function
-        /// </summary>
-        public enum StackTokenType
-        {
-            /// <summary>
-            /// The token is a value
-            /// </summary>
-            Value,
-            /// <summary>
-            /// An operand, this token can be an argument for associativity and precedence getter functions
-            /// </summary>
-            Operand,
-            /// <summary>
-            /// The name of a function that is beign called
-            /// </summary>
-            Function,
-            /// <summary>
-            /// A comma
-            /// </summary>
-            Comma,
-            /// <summary>
-            /// A left parenthesis
-            /// </summary>
-            LeftParenthesis,
-
-            /// <summary>
-            /// A right parenthesis
-            /// </summary>
-            RightParenthesis,
-        }
-
         private static bool PopOperatorByPrecedence(
-            bool  ToLeftAssociative,
+            bool ToLeftAssociative,
             int ToPrecedence,
             int SkPeekPrecedence)
         {
             if (ToLeftAssociative)
                 return ToPrecedence <= SkPeekPrecedence;
-            else 
+            else
                 return ToPrecedence < SkPeekPrecedence;
         }
 
+        /// <summary>
+        /// Convert infix to RPN notation
+        /// </summary>
+        /// <param name="Items"></param>
+        /// <returns></returns>
+
+        public static IReadOnlyList<OperatorToken> InfixToRPN(IEnumerable<OperatorToken> Items)
+        {
+            return InfixToRPN<OperatorToken>(Items, x => x.GetStackType(), x => x.Operator.Associativity == OperatorAssociativity.Left, x => x.Operator.Precedence);
+        }
 
         /// <summary>
         /// Convert infix to RPN notation
@@ -66,7 +46,7 @@ namespace SyntaxTools.Precedence
         {
             Queue<T> Out = new Queue<T>();
             Stack<T> Sk = new Stack<T>();
-            foreach(var To in Items)
+            foreach (var To in Items)
             {
 
                 StackTokenType StackType = GetType(To);
@@ -80,7 +60,7 @@ namespace SyntaxTools.Precedence
                     case StackTokenType.Operand:
                         while (
                             (Sk.Count > 0) &&
-                            (GetType(Sk.Peek()) == StackTokenType.Operand) && 
+                            (GetType(Sk.Peek()) == StackTokenType.Operand) &&
                             (PopOperatorByPrecedence(IsLeftAssociative(To), GetPrecedence(To), GetPrecedence(Sk.Peek()))))
                             Out.Enqueue(Sk.Pop());
                         Sk.Push(To);
@@ -141,6 +121,30 @@ namespace SyntaxTools.Precedence
             return Ret;
         }
 
+        /// <summary>
+        /// Convert an RPN expression to an expression tree
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Items">The RPN expression</param>
+        /// <param name="IsFunction">Return true if the given token is a function or an operator</param>
+        /// <param name="ArgumentCount">Return the number of arguments of the given token or operator</param>
+        /// <returns></returns>
+        public static Tree<T> RPNToTree<T>(IEnumerable<T> Items, Func<T, bool> IsFunction, Func<T, int> ArgumentCount)
+        {
+            var st = new Stack<Tree<T>>();
+            foreach (var Token in Items)
+            {
+                if (IsFunction(Token))
+                {
+                    //Extract arguments from the stack
+                    var argsCount = ArgumentCount(Token);
+                }
+                else
+                {
+                    st.Push(new Tree<T>(Token));
+                }
+            }
+        }
     }
 }
 

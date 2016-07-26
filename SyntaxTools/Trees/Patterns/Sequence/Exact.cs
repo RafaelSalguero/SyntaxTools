@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GenericCompiler.PatternMatching.Permutations;
 
-namespace SyntaxTools.Tree.Patterns.Sequence
+namespace SyntaxTools.Trees.Patterns.Sequence
 {
     /// <summary>
     /// Matches a sequence with the same order and item count

@@ -77,37 +77,18 @@ namespace SyntaxTools.Operators
             PostfixOrBinary
         }
 
-        /// <summary>
-        /// A pair of a a token and its related operator
-        /// </summary>
-        public class TokenOperatorPair
-        {
-            public TokenOperatorPair(IToken<Guid> Token, Operator Operator)
-            {
-                this.Token = Token;
-                this.Operator = Operator;
-            }
-
-            /// <summary>
-            /// The original token
-            /// </summary>
-            public IToken<Guid> Token { get; set; }
-            /// <summary>
-            /// The solved operator
-            /// </summary>
-            public Operator Operator { get; set; }
-        }
 
         /// <summary>
-        /// For each token, identifies each related operator (all the operators with the same symbol) and solve conflicts if more than one operator is related to the same symbol acording to operator
+        /// For each token, identifies each related operator (all the operators with the same symbol) and solve conflicts if more than one operator is related to the same symbol acording to operator.
+        /// This function uses the SpecialTokens for identifying special operators
         /// argument position rules
         /// </summary>
         /// <param name="Tokens">Token list to solve</param>
         /// <param name="Operators">The collection of operator definitions</param>
         /// <param name="TokenOperatorSelector"></param>
         /// <returns></returns>
-        public static IEnumerable<TokenOperatorPair> Solve(
-            IToken<Guid>[] Tokens,
+        public static IReadOnlyList<OperatorToken> Solve(
+             IReadOnlyList<TokenSubstring> Tokens,
             IEnumerable<Operator> Operators
             )
         {
@@ -125,12 +106,12 @@ namespace SyntaxTools.Operators
 
             //****************************************************************************
             //Presolve all operators onto an array of matches;
-            Solving[] Solving = new Solving[Tokens.Length];
-            var MatchArray = new List<Operator>[Tokens.Length];
-            for (int i = 0; i < Tokens.Length; i++)
+            Solving[] Solving = new Solving[Tokens.Count];
+            var MatchArray = new List<Operator>[Tokens.Count];
+            for (int i = 0; i < Tokens.Count; i++)
             {
                 List<Operator> Match;
-                if (OperatorDic.TryGetValue(Tokens[i].Token, out Match))
+                if (OperatorDic.TryGetValue(Tokens[i].Symbol, out Match))
                 {
                     MatchArray[i] = Match;
                     if (Match.Count == 1)
@@ -153,11 +134,11 @@ namespace SyntaxTools.Operators
                 else
                 {
                     //Identify parenthesis and commas:
-                    if (Tokens[i].Token == SpecialTokens.LeftParenthesis)
+                    if (Tokens[i].Symbol == SpecialTokens.LeftParenthesis)
                         Solving[i] = OperatorSolver.Solving.OpenParenthesis;
-                    else if (Tokens[i].Token == SpecialTokens.RightParenthesis)
+                    else if (Tokens[i].Symbol == SpecialTokens.RightParenthesis)
                         Solving[i] = OperatorSolver.Solving.ClosedParenthesis;
-                    else if (Tokens[i].Token == SpecialTokens.Comma)
+                    else if (Tokens[i].Symbol == SpecialTokens.Comma)
                         Solving[i] = OperatorSolver.Solving.Comma;
                     else
                         Solving[i] = OperatorSolver.Solving.Value;
@@ -165,13 +146,19 @@ namespace SyntaxTools.Operators
                 }
             }
 
+            var ret = new OperatorToken[Tokens.Count];
             //****************************************************************************
-            for (int i = 0; i < Tokens.Length; i++)
+            for (int i = 0; i < Tokens.Count; i++)
             {
-                if (Solving[i] == OperatorSolver.Solving.Value)
-                    yield return new TokenOperatorPair(Tokens[i], null);
+                if (Solving[i] == OperatorSolver.Solving.Value ||
+                    Solving[i] == OperatorSolver.Solving.OpenParenthesis ||
+                    Solving[i] == OperatorSolver.Solving.ClosedParenthesis ||
+                    Solving[i] == OperatorSolver.Solving.Comma
+                    )
+
+                    ret[i] = new OperatorToken(Tokens[i], null);
                 else if (MatchArray[i].Count == 1)
-                    yield return new TokenOperatorPair(Tokens[i], MatchArray[i][0]);
+                    ret[i] = new OperatorToken(Tokens[i], MatchArray[i][0]);
                 else
                 {
                     bool LeftArg = IsLeftArgument(i - 1, Solving);
@@ -183,7 +170,7 @@ namespace SyntaxTools.Operators
                     if (LeftArg && RightArg)
                     {
                         Solving[i] = OperatorSolver.Solving.Binary;
-                        yield return new TokenOperatorPair(Tokens[i], BinaryOp);
+                        ret[i] = new OperatorToken(Tokens[i], BinaryOp);
 
                     }
                     else
@@ -192,11 +179,13 @@ namespace SyntaxTools.Operators
                             Solving[i] = OperatorSolver.Solving.Postfix;
                         else
                             Solving[i] = OperatorSolver.Solving.Prefix;
-                        yield return new TokenOperatorPair(Tokens[i], OtherOp);
+                        ret[i] = new OperatorToken(Tokens[i], OtherOp);
                     }
                 }
 
             }
+
+            return ret;
         }
 
 

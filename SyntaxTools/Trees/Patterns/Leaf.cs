@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SyntaxTools.Tree.Patterns
+namespace SyntaxTools.Trees.Patterns
 {
     /// <summary>
     /// Match a tree with a given value and a collection of 

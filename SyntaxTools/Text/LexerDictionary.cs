@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using SyntaxTools.Text.LexerUnits;
 using SyntaxTools.Text.LexerUnits.StateMachines;
 using System.Reflection;
+using SyntaxTools.Global;
+
 namespace SyntaxTools.Text
 {
     /// <summary>
@@ -14,6 +16,11 @@ namespace SyntaxTools.Text
     /// </summary>
     public static class SpecialTokens
     {
+        static SpecialTokens()
+        {
+            GuidNames.SetName(Call, "Call");
+        }
+
         /// <summary>
         /// A line jump (CR, CR_LF, or LF)
         /// </summary>
@@ -48,7 +55,7 @@ namespace SyntaxTools.Text
         /// <summary>
         /// The function call operator, this is an internal operator
         /// </summary>
-        internal static Guid Call = Guid.NewGuid();
+        public static Guid Call = Guid.NewGuid();
 
         /// <summary>
         /// The dot operator

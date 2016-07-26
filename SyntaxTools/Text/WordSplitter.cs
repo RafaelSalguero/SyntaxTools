@@ -9,7 +9,7 @@ namespace SyntaxTools.Text
 {
     public static class WordSplitter
     {
-        public static IEnumerable<ISubstring> SplitWords(this ISubstring Text, IEnumerable<string> Separators)
+        public static IEnumerable<Substring> SplitWords(this Substring Text, IEnumerable<string> Separators)
         {
             var Matcher = WordMatcherTree.CreateTree(Separators);
 
@@ -38,7 +38,7 @@ namespace SyntaxTools.Text
                             if (acum > 0)
                             {
                                 //Not a separator:
-                                yield return Text.CompleteString.AsSubstring(i - acum - FullLen, acum);
+                                yield return new Substring(Text.CompleteString, i - acum - FullLen, acum);
                                 acum = 0;
                             }
 
@@ -46,7 +46,7 @@ namespace SyntaxTools.Text
                             if (MatchLen > 0)
                             {
                                 //Separator:
-                                yield return Text.CompleteString.AsSubstring(i - FullLen, MatchLen);
+                                yield return new Substring(Text.CompleteString, i - FullLen, MatchLen);
                             }
 
                             i -= MismatchLen + 1;
@@ -72,7 +72,7 @@ namespace SyntaxTools.Text
             if (acum > 1)
             {
                 //Not a separator:
-                yield return Text.CompleteString.AsSubstring(Text.Index + Text.Length - acum + 1, acum - 1);
+                yield return new Substring(Text.CompleteString, Text.Index + Text.Length - acum + 1, acum - 1);
             }
         }
 

@@ -124,25 +124,16 @@ namespace SyntaxTools.Text.LexerUnits
                 return new LexerWordLenght(1, Guid.Empty);
         }
 
-        /// <summary>
-        /// Split a substring by finding the largest symbol identified by the given parsers
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <param name="Parsers"></param>
-        /// <returns></returns>
-        public static List<ITokenSubstring<Guid>> Split(string Text, IEnumerable<ITokenizedParser> Parsers)
-        {
-            return Split(Text.AsSubstring(), Parsers);
-        }
+
         /// <summary>
         /// Split a substring by finding the largest symbol identified by the given parsers
         /// </summary>
         /// <param name="Text"></param>
         /// <returns></returns>
-        public static List<ITokenSubstring<Guid>> Split(ISubstring Text, IEnumerable<ITokenizedParser> Parsers)
+        public static List<TokenSubstring> Split(Substring Text, IEnumerable<ITokenizedParser> Parsers)
         {
             var str = Text.CompleteString;
-            var result = new List<ITokenSubstring<Guid>>();
+            var result = new List<TokenSubstring>();
             //Text substring indexes:
             int index = Text.Index;
             int lastIndex = Text.Index + Text.Length;
@@ -165,11 +156,11 @@ namespace SyntaxTools.Text.LexerUnits
                     //Add the last unidentified word if any
                     if (UnidentifiedWordLen > 0)
                     {
-                        result.Add(str.AsSubstring(i - UnidentifiedWordLen, UnidentifiedWordLen).AsToken(Guid.Empty));
+                        result.Add(new TokenSubstring(Guid.Empty, new Substring(str, i - UnidentifiedWordLen, UnidentifiedWordLen)));
                         UnidentifiedWordLen = 0;
                     }
                     //Add the parsed symbol
-                    result.Add(str.AsSubstring(i, AdvanceWord.Lenght).AsToken(AdvanceWord.Token));
+                    result.Add(new TokenSubstring(AdvanceWord.Token, new Substring(str, i, AdvanceWord.Lenght)));
                 }
                 //Advance the char index by the length returned by the FindLargestValidSequence
                 i += AdvanceWord.Lenght;
@@ -177,7 +168,7 @@ namespace SyntaxTools.Text.LexerUnits
 
             //Add the last unidentified word if any
             if (UnidentifiedWordLen > 0)
-                result.Add(str.AsSubstring(i - UnidentifiedWordLen, UnidentifiedWordLen).AsToken(Guid.Empty));
+                result.Add(new TokenSubstring(Guid.Empty, new Substring(str, i - UnidentifiedWordLen, UnidentifiedWordLen)));
             return result;
         }
 

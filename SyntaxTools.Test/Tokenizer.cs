@@ -26,18 +26,19 @@ namespace SyntaxTools.Test
                 AddTokens<CommonTokens.Aritmetic>();
                 Add("(", SpecialTokens.LeftParenthesis);
                 Add(")", SpecialTokens.RightParenthesis);
+                Add(",", SpecialTokens.Comma);
             }
         }
 
         Keywords words = new Tokenizer.Keywords();
 
-        public IReadOnlyList<ITokenSubstring<Guid>> Tokenize(ISubstring Text, bool RemoveWhitespaces = true)
+        public IReadOnlyList<TokenSubstring> Tokenize(Substring Text, bool RemoveWhitespaces = true)
         {
             var R = LexerSplitter.Split(Text, words);
 
             //Tokenizer extra logic
             if (RemoveWhitespaces)
-                return R.Where(x => x.Token != SpecialTokens.WhiteSpace).ToList();
+                return R.Where(x => x.Symbol != SpecialTokens.WhiteSpace).ToList();
             else
                 return R;
         }
@@ -45,23 +46,29 @@ namespace SyntaxTools.Test
 
     public class ExpressionParser
     {
-        private List<Operator> Operators;
+        private Dictionary<Guid, Operator> Operators;
         private Tokenizer Tokenizer = new Tokenizer();
         public ExpressionParser()
         {
             //Get operators from common operators:
-            this.Operators = new List<Operator>(typeof(CommonOperators).GetProperties(System.Reflection.BindingFlags.Static).Select(x => x.GetValue(null)).Cast<Operator>());
+            this.Operators = typeof(CommonOperators).GetProperties(System.Reflection.BindingFlags.Static).Select(x => x.GetValue(null)).Cast<Operator>().ToDictionary(x => x.Id);
         }
-        
+       
+
+
         /// <summary>
         /// Parse an expression and return the Operator solved and RPN representation of the input
         /// </summary>
         /// <param name="Text"></param>
         /// <returns></returns>
-        public IReadOnlyList<ITokenSubstring<Guid>> Parse(ISubstring Text)
+        public IReadOnlyList<OperatorToken> Parse(Substring Text)
         {
             var Tokens = Tokenizer.Tokenize(Text);
-            return RPN.InfixToRPN()
+            var OpSolved = OperatorSolver.Solve(Tokens, Operators.Values);
+
+            // var ret = RPN.InfixToRPN<OperatorToken>(OpSolved, this.GetStackType, x => this.Operators[x.Symbol].Associativity == OperatorAssociativity.Left, x => this.Operators[x.Symbol].Precedence);
+            //return ret;
+            throw new NotImplementedException();
         }
     }
 

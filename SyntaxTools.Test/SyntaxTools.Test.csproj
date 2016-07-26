@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Operators\Tokenizer.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Patterns.cs" />
     <Compile Include="UnitTest1.cs" />
