@@ -40,6 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackusNaur\BackusExpression.cs" />
+    <Compile Include="BackusNaur\Exceptions.cs" />
+    <Compile Include="BackusNaur\Expressions\Cases.cs" />
+    <Compile Include="BackusNaur\Expressions\Sequence.cs" />
+    <Compile Include="BackusNaur\Expressions\Terminal.cs" />
+    <Compile Include="BackusNaur\BackusNaurResult.cs" />
     <Compile Include="CompilerException.cs" />
     <Compile Include="DataStructures\ISubstring.cs" />
     <Compile Include="DataStructures\StateDequeue.cs" />
@@ -50,6 +56,7 @@
     <Compile Include="Operators\Operator.cs" />
     <Compile Include="Operators\OperatorToken.cs" />
     <Compile Include="Operators\StackTokenType.cs" />
+    <Compile Include="Trees\Patterns\PatternFactory.cs" />
     <Compile Include="Precedence\RPN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Global\CommonTokens.cs" />

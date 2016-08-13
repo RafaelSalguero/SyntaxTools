@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SyntaxTools.Operators;
 
 namespace SyntaxTools.Trees.Patterns
 {
     /// <summary>
     /// Match any tree without variable binding
     /// </summary>
-    public class Any<T> : TreePattern<T>
+    public class Any : TreePattern
     {
-        public override IReadOnlyList<MatchResult<T, Tree<T>>> Match(Tree<T> Tree)
+        public override IReadOnlyList<MatchResult<string, ExpressionTree>> Match(ExpressionTree Tree)
         {
-             return new[] { new MatchResult<T, Tree<T>>() };
+            return new[] { new MatchResult<string, ExpressionTree>() };
+        }
+
+        public override string ToString()
+        {
+            return "?";
         }
     }
 
@@ -21,16 +27,21 @@ namespace SyntaxTools.Trees.Patterns
     /// Match any tree binding its value to a variable
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Variable<T> : TreePattern<T>
+    public class Variable : TreePattern
     {
-        public readonly T Key;
-        public Variable(T Key)
+        public readonly string Key;
+        public Variable(string Key)
         {
             this.Key = Key;
         }
-        public override IReadOnlyList<MatchResult<T, Tree<T>>> Match(Tree<T> Tree)
+        public override IReadOnlyList<MatchResult<string, ExpressionTree>> Match(ExpressionTree Tree)
         {
-          return  new[] { new MatchResult<T, Tree<T>>(Key, Tree) };
+            return new[] { new MatchResult<string, ExpressionTree>(Key, Tree) };
+        }
+
+        public override string ToString()
+        {
+            return Key.ToString() + "?";
         }
     }
 }

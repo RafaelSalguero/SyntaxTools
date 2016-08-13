@@ -64,17 +64,21 @@ namespace SyntaxTools.DataStructures
         /// <returns></returns>
         public bool Equals(Substring other)
         {
-            if (object.ReferenceEquals(this.CompleteString, other.CompleteString))
-            {
-                return
+            if (object.ReferenceEquals(this.CompleteString, other.CompleteString) && (
              this.Index == other.Index &&
-             this.Length == other.Length;
+             this.Length == other.Length))
+            {
+                return true;
             }
             else
-                throw new ArgumentException("Can't compare substring from diferent original strings");
+                return this.ToString() == other.ToString();
         }
 
 
+        /// <summary>
+        /// Return the string representation of this substring
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return this.completeString.Substring(this.Index, this.Length);

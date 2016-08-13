@@ -121,29 +121,59 @@ namespace SyntaxTools.Precedence
             return Ret;
         }
 
+
         /// <summary>
         /// Convert an RPN expression to an expression tree
+        /// </summary>
+        /// <param name="Items">The RPN expression</param>
+        /// <returns></returns>
+        public static ExpressionTree RPNToTree(IEnumerable<OperatorToken> Items)
+        {
+            if (!Items.Any())
+            {
+                throw new ArgumentException("Items can't be empty", nameof(Items));
+            }
+            var St = RPNToTree<OperatorToken, ExpressionTree>(Items, x => x.Operator != null, x => x.Operator.ArgumentCount, (head, childs) => new ExpressionTree(head, childs));
+            if (St.Count != 1)
+            {
+                throw new CompilerException("Stack operator mismatch", Items.First().Substring);
+            }
+            return St.Pop();
+        }
+        /// <summary>
+        /// Convert an RPN expression to an expression tree. The resulting stack will have only one item if the input expression is balanced
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="Items">The RPN expression</param>
         /// <param name="IsFunction">Return true if the given token is a function or an operator</param>
         /// <param name="ArgumentCount">Return the number of arguments of the given token or operator</param>
         /// <returns></returns>
-        public static Tree<T> RPNToTree<T>(IEnumerable<T> Items, Func<T, bool> IsFunction, Func<T, int> ArgumentCount)
+        public static Stack<TTree> RPNToTree<T, TTree>(IEnumerable<T> Items, Func<T, bool> IsFunction, Func<T, int> ArgumentCount, Func<T, TTree[], TTree> TreeFactory)
+            where TTree : ITree<T>
         {
-            var st = new Stack<Tree<T>>();
+            var st = new Stack<TTree>();
             foreach (var Token in Items)
             {
                 if (IsFunction(Token))
                 {
                     //Extract arguments from the stack
                     var argsCount = ArgumentCount(Token);
+                    var args = new TTree[argsCount];
+
+                    //Stack arguments are reversed in order
+                    for (var i = argsCount - 1; i >= 0; i--)
+                    {
+                        args[i] = st.Pop();
+                    }
+
+                    st.Push(TreeFactory(Token, args));
                 }
                 else
                 {
-                    st.Push(new Tree<T>(Token));
+                    st.Push(TreeFactory(Token, new TTree[0]));
                 }
             }
+            return st;
         }
     }
 }

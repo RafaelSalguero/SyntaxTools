@@ -11,12 +11,19 @@ namespace SyntaxTools.Operators
     /// <summary>
     /// Output from the operator solver
     /// </summary>
-    public class OperatorToken : TokenSubstring
+    public class OperatorToken : TokenSubstring, IEquatable<OperatorToken>
     {
         public OperatorToken(TokenSubstring Other, Operator Operator) : base(Other.Symbol, Other.Substring)
         {
             this.Operator = Operator;
         }
+
+        /// <summary>
+        /// Create a new operator token
+        /// </summary>
+        /// <param name="Symbol">The operator token symbol</param>
+        /// <param name="Substring">The substring originating this token</param>
+        /// <param name="Operator">The token operator or null if this isn't an operator</param>
         public OperatorToken(Guid Symbol, Substring Substring, Operator Operator) : base(Symbol, Substring)
         {
             this.Operator = Operator;
@@ -46,9 +53,14 @@ namespace SyntaxTools.Operators
         public override string ToString()
         {
             if (Operator != null)
-                return Substring.ToString() + " (" + Operator.ToString() + ")";
+                return Operator.ToString();
             else
                 return Substring.ToString();
+        }
+
+        public bool Equals(OperatorToken other)
+        {
+            return object.Equals(other.Operator?.Id, this.Operator?.Id) && other.Substring.Equals(this.Substring) && object.Equals(other.Symbol, this.Symbol);
         }
     }
 }

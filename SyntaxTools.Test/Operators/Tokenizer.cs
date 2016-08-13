@@ -9,6 +9,8 @@ using SyntaxTools.Text;
 using SyntaxTools.Test;
 using SyntaxTools.DataStructures;
 using SyntaxTools.Global;
+using SyntaxTools.Trees;
+using SyntaxTools.Trees.Patterns;
 
 namespace SyntaxTools.Operators.Tests
 {
@@ -83,7 +85,7 @@ namespace SyntaxTools.Operators.Tests
             var Tok = new Tokenizer();
             var Tokens = Tok.Tokenize(new Substring(Expr));
 
-            var Operators = typeof(CommonOperators).GetFields( ).Select(x => x.GetValue(null)).Cast<Operator>().ToList();
+            var Operators = typeof(CommonOperators).GetFields().Select(x => x.GetValue(null)).Cast<Operator>().ToList();
 
             var Solved = OperatorSolver.Solve(Tokens, Operators);
 
@@ -101,6 +103,65 @@ namespace SyntaxTools.Operators.Tests
                CommonOperators.Add.Id, //*
                SpecialTokens.Call, //*
             }));
+        }
+
+        [TestMethod]
+        public void TreeTest()
+        {
+            var Expr = "Func(1, (1+2*3))";
+            var Tok = new Tokenizer();
+            var Tokens = Tok.Tokenize(new Substring(Expr));
+
+            var Operators = typeof(CommonOperators).GetFields().Select(x => x.GetValue(null)).Cast<Operator>().ToList();
+
+            var Solved = OperatorSolver.Solve(Tokens, Operators);
+
+            var CallSolved = CallSolver.InsertCallOperator(Solved);
+
+            var RPN = Precedence.RPN.InfixToRPN(CallSolved);
+            var Tree = Precedence.RPN.RPNToTree(RPN);
+
+
+        }
+
+        [TestMethod]
+        public void PatternTest2()
+        {
+            var PattStr = "x + x";
+            var ExprStr = "1 + 1";
+            var Variables = new[] { "x" };
+
+            var Parser = new ExpressionParser();
+            var R = Parser.Parse(new Substring(PattStr));
+            var Expr = Parser.Parse(new Substring(ExprStr));
+
+            var Patt = PatternFactory.PatternFromTree(R, new[] { "x" });
+            var Match = Patt.Match(Expr);
+
+            Assert.AreEqual(1, Match.Count);
+
+            var FirstMatch = Match.First();
+            Assert.AreEqual(1, FirstMatch.Values.Count);
+
+            var FirstMatchVariable = FirstMatch.Values.First();
+            Assert.AreEqual("x", FirstMatchVariable.Key);
+
+            var One = new ExpressionTree(new OperatorToken(SpecialTokens.Number, new Substring("1"), null));
+            Assert.IsTrue(One.Equals(FirstMatchVariable.Value));
+        }
+
+        [TestMethod]
+        public void MethodCallTest()
+        {
+            var ExprStr = "integrate(x * x)";
+
+            var Parser = new ExpressionParser();
+            var Expr = Parser.Parse(new Substring(ExprStr));
+
+            Assert.AreEqual(SpecialTokens.Call, Expr.Value.Symbol);
+
+            var CallArgs = Expr.Childs;
+            Assert.AreEqual("integrate", CallArgs[0].Value.Substring.ToString());
         }
     }
 }

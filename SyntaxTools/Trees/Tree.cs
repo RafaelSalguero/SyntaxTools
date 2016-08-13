@@ -3,19 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SyntaxTools.Operators;
 
 namespace SyntaxTools.Trees
 {
+
+    public interface ITree<T>
+    {
+        T Value { get; }
+        IReadOnlyList<ITree<T>> Childs { get; }
+    }
+  
+
     /// <summary>
     /// Generic n-child tree
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Tree<T> : IEquatable<Tree<T>>
+    public class ExpressionTree : IEquatable<ExpressionTree>, ITree<OperatorToken>
     {
         /// <summary>
         /// Create a new tree
         /// </summary>
-        public Tree(T Value, IEnumerable<Tree<T>> Childs)
+        public ExpressionTree(OperatorToken Value, IEnumerable<ExpressionTree> Childs)
         {
             this.Value = Value;
             this.Childs = Childs.ToList();
@@ -24,21 +33,29 @@ namespace SyntaxTools.Trees
         /// <summary>
         /// Create a new tree
         /// </summary>
-        public Tree(T Value, params Tree<T>[] Childs) : this(Value, (IEnumerable<Tree<T>>)Childs)
+        public ExpressionTree(OperatorToken Value, params ExpressionTree[] Childs) : this(Value, (IEnumerable<ExpressionTree>)Childs)
         {
         }
 
         /// <summary>
         /// Expression value. 
         /// </summary>
-        public T Value { get; private set; }
+        public OperatorToken Value { get; private set; }
 
         /// <summary>
         /// Expression childrens
         /// </summary>
-        public IReadOnlyList<Tree<T>> Childs { get; private set; }
+        public IReadOnlyList<ExpressionTree> Childs { get; private set; }
 
-        public bool Equals(Tree<T> other)
+        IReadOnlyList<ITree<OperatorToken>> ITree<OperatorToken>.Childs
+        {
+            get
+            {
+                return Childs;
+            }
+        }
+
+        public bool Equals(ExpressionTree other)
         {
             if (!Value.Equals(other.Value))
                 return false;

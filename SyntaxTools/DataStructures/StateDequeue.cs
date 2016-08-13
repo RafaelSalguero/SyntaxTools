@@ -18,10 +18,20 @@ namespace SyntaxTools.DataStructures
         public StateDequeue(IReadOnlyList<T> Data)
         {
             this.Data = Data;
-            this.ReadPointer = 0;
+            this.readPointer = 0;
         }
         private IReadOnlyList<T> Data;
-        private int ReadPointer;
+        private int readPointer;
+        /// <summary>
+        /// Gets the absolute current read pointer
+        /// </summary>
+        public int AbsoluteReadPointer
+        {
+            get
+            {
+                return readPointer;
+            }
+        }
         private Stack<int> state = new Stack<int>();
 
         /// <summary>
@@ -29,7 +39,7 @@ namespace SyntaxTools.DataStructures
         /// </summary>
         public void PushState()
         {
-            state.Push(ReadPointer);
+            state.Push(readPointer);
         }
 
         /// <summary>
@@ -37,7 +47,7 @@ namespace SyntaxTools.DataStructures
         /// </summary>
         public void PopState()
         {
-            ReadPointer = state.Pop();
+            readPointer = state.Pop();
         }
 
         /// <summary>
@@ -55,7 +65,7 @@ namespace SyntaxTools.DataStructures
         {
             get
             {
-                return ReadPointer >= Data.Count;
+                return readPointer >= Data.Count;
             }
         }
 
@@ -65,17 +75,17 @@ namespace SyntaxTools.DataStructures
         /// <returns></returns>
         public T Peek()
         {
-            return Data[ReadPointer];
+            return Data[readPointer];
         }
 
         /// <summary>
-        /// Read an element from the queue
+        /// Consume an element from the queue
         /// </summary>
         /// <returns></returns>
         public T Dequeue()
         {
-            if (ReadPointer < Data.Count)
-                return Data[ReadPointer++];
+            if (readPointer < Data.Count)
+                return Data[readPointer++];
             else
                 throw new InvalidOperationException("The queue is empty");
         }

@@ -29,6 +29,11 @@ namespace SyntaxTools.Text
         /// </summary>
         public Substring Substring { get; private set; }
 
+        public override string ToString()
+        {
+            return Substring.ToString() + "[" + Global.GuidNames.GetName(Symbol) + "]";
+        }
+
         public bool Equals(TokenSubstring other)
         {
             return other.Symbol == this.Symbol && other.Substring.Equals(this.Substring);

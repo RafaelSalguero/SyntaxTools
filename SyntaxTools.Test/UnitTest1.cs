@@ -77,7 +77,10 @@ namespace SyntaxTools.Test
             var rafa1_2 = str.AsSubstring(8, 4).AsToken(rafaGuid);
 
             Assert.IsTrue(hola1.Equals(hola1));
-            Assert.IsFalse(hola1.Equals(hola2));
+
+            //Equal substrings should remain equal even if they are from different part of the original string
+            //This is for enabling pattern matching recognizing equal strings from different parts
+            Assert.IsTrue(hola1.Equals(hola2));
             Assert.IsTrue(rafa1_1.Equals(rafa1_2));
             Assert.IsFalse(hola1.Equals(rafa1_1));
 

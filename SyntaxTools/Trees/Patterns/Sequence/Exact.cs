@@ -11,33 +11,33 @@ namespace SyntaxTools.Trees.Patterns.Sequence
     /// Matches a sequence with the same order and item count
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Exact<T> : SequencePattern<T>
+    public class Exact : SequencePattern
     {
-        public Exact(IEnumerable<TreePattern<T>> Sequence)
+        public Exact(IReadOnlyList<TreePattern> Sequence)
         {
-            this.Sequence = Sequence.ToList();
+            this.Sequence = Sequence;
         }
-        public Exact(params TreePattern<T>[] Sequence) : this((IEnumerable<TreePattern<T>>)Sequence)
+        public Exact(params TreePattern[] Sequence) : this((IReadOnlyList<TreePattern>)Sequence)
         {
         }
 
         /// <summary>
         /// The sequence to match
         /// </summary>
-        public readonly IReadOnlyList<TreePattern<T>> Sequence;
+        public readonly IReadOnlyList<TreePattern> Sequence;
 
-        public override IReadOnlyList<MatchResult<T, Tree<T>>> Match(IReadOnlyList<Tree<T>> Sequence)
+        public override IReadOnlyList<MatchResult<string, ExpressionTree>> Match(IReadOnlyList<ExpressionTree> Sequence)
         {
             if (this.Sequence.Count != Sequence.Count)
-                return new MatchResult<T, Tree<T>>[0];
+                return new MatchResult<string, ExpressionTree>[0];
 
-            var Digits = new IEnumerable<MatchResult<T, Tree<T>>>[Sequence.Count];
+            var Digits = new IEnumerable<MatchResult<string, ExpressionTree>>[Sequence.Count];
             for (var i = 0; i < Sequence.Count; i++)
             {
                 Digits[i] = this.Sequence[i].Match(Sequence[i]);
             }
 
-            var Result = new List<MatchResult<T, Tree<T>>>();
+            var Result = new List<MatchResult<string, ExpressionTree>>();
             var Power = PermutationGenerator.PowerCombine(Digits);
             foreach (var String in Power)
             {
@@ -47,6 +47,11 @@ namespace SyntaxTools.Trees.Patterns.Sequence
             }
 
             return Result.AsReadOnly();
+        }
+
+        public override string ToString()
+        {
+            return Sequence.Select(x => x.ToString()).Aggregate("", (a, b) => a == "" ? b : a + ", " + b);
         }
     }
 }

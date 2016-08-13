@@ -17,7 +17,10 @@ namespace SyntaxTools
         {
             this.Position = Position;
         }
-
+        public CompilerException(string message, Substring Position, Exception InnerException) : base(message, InnerException)
+        {
+            this.Position = Position;
+        }
         public readonly Substring Position;
 
     }

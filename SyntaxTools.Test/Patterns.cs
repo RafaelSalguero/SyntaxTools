@@ -39,20 +39,6 @@ namespace SyntaxTools.Test
             Assert.IsTrue(R.Select(x => x.Symbol).SequenceEqual(Expected));
         }
 
-        [TestMethod]
-        public void PatternTest()
-        {
-            //pattern for x + x
-            var Pattern = new Trees.Patterns.Leaf<string>("+", new Exact<string>(new Variable<string>("x"), new Variable<string>("x")));
 
-            //expression 5 + 5
-            var Expression = new Tree<string>("+", new Tree<string>("5"), new Tree<string>("5"));
-
-            var Match = Pattern.Match(Expression);
-
-            Assert.AreEqual(1, Match.Count);
-            Assert.AreEqual(1, Match[0].Values.Count);
-            Assert.AreEqual("5", Match[0].Values["x"].Value);
-        }
     }
 }

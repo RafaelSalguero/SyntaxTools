@@ -9,6 +9,7 @@ using SyntaxTools.Operators;
 using SyntaxTools.Precedence;
 using SyntaxTools.Text;
 using SyntaxTools.Text.LexerUnits;
+using SyntaxTools.Trees;
 
 namespace SyntaxTools.Test
 {
@@ -46,12 +47,12 @@ namespace SyntaxTools.Test
 
     public class ExpressionParser
     {
-        private Dictionary<Guid, Operator> Operators;
+        private  IReadOnlyList< Operator > Operators;
         private Tokenizer Tokenizer = new Tokenizer();
         public ExpressionParser()
         {
             //Get operators from common operators:
-            this.Operators = typeof(CommonOperators).GetProperties(System.Reflection.BindingFlags.Static).Select(x => x.GetValue(null)).Cast<Operator>().ToDictionary(x => x.Id);
+            this.Operators = typeof(CommonOperators).GetFields().Select(x => x.GetValue(null)).Cast<Operator>().ToList();
         }
        
 
@@ -61,14 +62,14 @@ namespace SyntaxTools.Test
         /// </summary>
         /// <param name="Text"></param>
         /// <returns></returns>
-        public IReadOnlyList<OperatorToken> Parse(Substring Text)
+        public ExpressionTree Parse(Substring Text)
         {
             var Tokens = Tokenizer.Tokenize(Text);
-            var OpSolved = OperatorSolver.Solve(Tokens, Operators.Values);
+            var OpSolved = OperatorSolver.Solve(Tokens, Operators);
+            var CallSolved = CallSolver.InsertCallOperator(OpSolved);
+            var RPN = Precedence.RPN.InfixToRPN(CallSolved);
 
-            // var ret = RPN.InfixToRPN<OperatorToken>(OpSolved, this.GetStackType, x => this.Operators[x.Symbol].Associativity == OperatorAssociativity.Left, x => this.Operators[x.Symbol].Precedence);
-            //return ret;
-            throw new NotImplementedException();
+            return Precedence.RPN.RPNToTree(RPN);
         }
     }
 
